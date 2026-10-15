@@ -1,0 +1,753 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Cuentas Claras</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: barra inferior en celular, menú lateral en PC; una sola columna de tarjetas grandes y botones de 48px o más. */
+:root{
+  --bg:#EEF1F4; --surface:#FFFFFF; --surface2:#F5F7F9; --ink:#101C26; --muted:#566673; --line:#D6DEE5;
+  --accent:#0B5D7A; --accent-ink:#FFFFFF; --accent-soft:#DAEDF4;
+  --good:#146B41; --good-soft:#DCF1E5; --warn:#8A5200; --warn-soft:#FBEAC6; --bad:#B3261E; --bad-soft:#FBE0DD;
+  --shadow:0 1px 2px rgba(16,28,38,.06),0 6px 20px rgba(16,28,38,.06);
+  --display:'Bricolage Grotesque','Trebuchet MS',system-ui,sans-serif;
+  --body:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1319; --surface:#15202A; --surface2:#1B2833; --ink:#E9EFF3; --muted:#9AAAB6; --line:#2A3A47;
+  --accent:#5CC3E8; --accent-ink:#06222E; --accent-soft:#123446;
+  --good:#5ED496; --good-soft:#12382A; --warn:#F2BC4F; --warn-soft:#3B2C0B; --bad:#FF8F85; --bad-soft:#401815;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C1319; --surface:#15202A; --surface2:#1B2833; --ink:#E9EFF3; --muted:#9AAAB6; --line:#2A3A47;
+  --accent:#5CC3E8; --accent-ink:#06222E; --accent-soft:#123446;
+  --good:#5ED496; --good-soft:#12382A; --warn:#F2BC4F; --warn-soft:#3B2C0B; --bad:#FF8F85; --bad-soft:#401815;
+  --shadow:0 1px 2px rgba(0,0,0,.4),0 6px 20px rgba(0,0,0,.3); color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.45;padding-inline:16px;padding-block:0 96px;-webkit-text-size-adjust:100%}
+body.lock{overflow:hidden}
+h1,h2,h3{font-family:var(--display);line-height:1.1;margin:0;text-wrap:balance}
+p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.app{max-width:1000px;margin-inline:auto}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px;position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:10}
+.brand{font-family:var(--display);font-weight:800;font-size:1.35rem;letter-spacing:-.01em}
+.top-r{display:flex;align-items:center;gap:8px;min-width:0}
+.sync{font-size:.8rem;color:var(--muted);padding:6px 10px;border-radius:99px;background:var(--surface);border:1px solid var(--line);white-space:nowrap}
+.sync.err{color:var(--bad);border-color:var(--bad)}
+.icon-btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer}
+.icon-btn svg{width:22px;height:22px}
+.shell{display:block}
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:20;display:grid;grid-template-columns:repeat(5,1fr);gap:2px;background:var(--surface);border-top:1px solid var(--line);padding:6px 6px calc(6px + env(safe-area-inset-bottom,0px))}
+.nav button{position:relative;border:0;background:none;border-radius:12px;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-size:.78rem;font-weight:600;color:var(--muted);cursor:pointer}
+.nav button svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.nav button[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
+.badge{position:absolute;top:2px;right:calc(50% - 26px);min-width:20px;height:20px;border-radius:99px;background:var(--bad);color:#fff;font-size:.72rem;font-weight:700;display:grid;place-items:center;padding-inline:5px}
+@media (min-width:900px){
+  body{padding-block:0 48px}
+  .shell{display:grid;grid-template-columns:200px minmax(0,1fr);gap:32px;align-items:start}
+  .nav{position:sticky;top:84px;left:auto;right:auto;bottom:auto;display:flex;flex-direction:column;gap:4px;border:1px solid var(--line);border-radius:16px;padding:8px}
+  .nav button{flex-direction:row;justify-content:flex-start;gap:12px;padding-inline:14px;min-height:50px;font-size:1rem}
+  .badge{position:static;margin-left:auto}
+}
+main{min-width:0;display:flex;flex-direction:column;gap:18px;padding-bottom:8px}
+.head{display:flex;flex-direction:column;gap:4px}
+.head h1{font-size:clamp(1.7rem,5vw,2.3rem);font-weight:800}
+.sub{color:var(--muted)}
+.section-t{font-family:var(--display);font-weight:700;font-size:1.15rem;margin-top:6px}
+.stack{display:flex;flex-direction:column;gap:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;min-width:0}
+.card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.card-h b{font-size:1.1rem;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--muted);font-size:.95rem;align-items:center}
+.meta span{display:inline-flex;align-items:center;gap:6px}
+.dot{width:14px;height:14px;border-radius:50%;background:var(--c,#888);display:inline-block;flex:none;box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+.pill{display:inline-flex;align-items:center;border-radius:99px;padding:4px 11px;font-size:.85rem;font-weight:700;white-space:nowrap}
+.pill.late,.pill.cut{background:var(--bad-soft);color:var(--bad)}
+.pill.today{background:var(--warn-soft);color:var(--warn)}
+.pill.soon{background:var(--warn-soft);color:var(--warn)}
+.pill.ok{background:var(--good-soft);color:var(--good)}
+.pill.neutral{background:var(--surface2);color:var(--muted);border:1px solid var(--line)}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 18px;border-radius:12px;border:2px solid var(--line);background:var(--surface);font-weight:700;font-size:1rem;cursor:pointer;text-decoration:none;color:var(--ink);text-align:center}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
+.btn.danger.armed{background:var(--bad);color:#fff}
+.btn.big{width:100%;min-height:56px;font-size:1.1rem}
+.btn.small{min-height:40px;padding:6px 12px;font-size:.92rem}
+.btn.ghost{border-color:transparent;background:var(--surface2)}
+.fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:15;min-height:56px;padding-inline:22px;border-radius:99px;box-shadow:0 8px 24px rgba(0,0,0,.28)}
+@media (min-width:900px){.fab{bottom:28px;right:max(24px,calc(50vw - 480px))}}
+.empty{text-align:left;padding:22px;border:2px dashed var(--line);border-radius:16px;color:var(--muted);display:flex;flex-direction:column;gap:12px}
+.empty b{color:var(--ink);font-family:var(--display);font-size:1.2rem}
+.steps{display:flex;flex-direction:column;gap:12px;counter-reset:s}
+.step{display:flex;gap:14px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;flex-wrap:wrap}
+.step .n{width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;flex:none}
+.step .t{flex:1 1 200px;min-width:0}
+.step .t b{display:block}
+.step .t span{color:var(--muted);font-size:.95rem}
+.banner{background:var(--warn-soft);color:var(--warn);border-radius:14px;padding:12px 14px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;font-weight:600}
+.banner .btn{min-height:40px;padding:6px 14px}
+input,select,textarea{width:100%;min-height:48px;border:2px solid var(--line);border-radius:12px;background:var(--surface);padding:10px 12px}
+textarea{min-height:120px;resize:vertical;line-height:1.5}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);outline:none}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.lbl{font-weight:700;font-size:.95rem}
+.field small{color:var(--muted)}
+.form{display:flex;flex-direction:column;gap:16px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px}
+.err{color:var(--bad);font-weight:600}
+.lead{font-size:1.05rem;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:10px}
+.chip input,.opt input{position:absolute;opacity:0;pointer-events:none}
+.chip{position:relative}
+.chip span{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:8px 16px;border-radius:99px;border:2px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer}
+.chip input:checked+span{border-color:var(--accent);background:var(--accent-soft)}
+.chip input:focus-visible+span,.opt input:focus-visible+div{outline:3px solid var(--accent);outline-offset:2px}
+.chip input:disabled+span{opacity:.45;cursor:not-allowed}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{position:relative;display:block}
+.opt>div{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;border:2px solid var(--line);border-radius:12px;padding:12px 14px;cursor:pointer;background:var(--surface);min-height:52px;min-width:0}
+.opt input:checked+div{border-color:var(--accent);background:var(--accent-soft)}
+.opt b{overflow-wrap:anywhere}
+.opt small{color:var(--muted)}
+.profiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.prof{border:2px solid var(--line);background:var(--surface2);border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:4px;text-align:left;cursor:pointer;min-width:0}
+.prof:hover{border-color:var(--accent)}
+.prof .pn{display:flex;align-items:center;gap:8px;font-weight:700}
+.prof .pin{font-variant-numeric:tabular-nums;letter-spacing:.14em;font-weight:700;color:var(--muted)}
+.prof .who{font-size:.85rem;color:var(--muted);overflow-wrap:anywhere}
+.prof.full{background:var(--good-soft)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:.98rem}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.secret{font-variant-numeric:tabular-nums;cursor:pointer;background:var(--surface2);border:1px dashed var(--line);border-radius:8px;padding:2px 8px}
+.hero{background:var(--accent);color:var(--accent-ink);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:6px}
+.hero small{opacity:.85;font-weight:600}
+.hero .big-n{font-family:var(--display);font-weight:800;font-size:clamp(2.4rem,9vw,3.4rem);line-height:1;font-variant-numeric:tabular-nums}
+.hero.neg{background:var(--bad);color:#fff}
+.table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.tscroll{overflow-x:auto}
+.table th,.table td{text-align:right;padding:10px 8px;border-bottom:1px solid var(--line);white-space:nowrap}
+.table th:first-child,.table td:first-child{text-align:left;white-space:normal;min-width:140px}
+.table th{font-size:.8rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.bar{height:8px;border-radius:99px;background:var(--surface2);overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--accent)}
+.pos{color:var(--good);font-weight:700}.neg-t{color:var(--bad);font-weight:700}
+.msg{display:flex;flex-direction:column;gap:8px}
+.msg-h{font-weight:700}
+mark{background:var(--accent-soft);color:var(--accent);border-radius:4px;padding:0 3px;font-weight:600}
+.tplt{white-space:pre-wrap;overflow-wrap:anywhere;color:var(--ink);background:var(--surface2);border-radius:12px;padding:12px;font-size:.95rem}
+.vars{display:flex;flex-wrap:wrap;gap:6px}
+.vars button{border:1px solid var(--line);background:var(--surface2);border-radius:99px;padding:6px 12px;font-weight:600;cursor:pointer;min-height:36px}
+.sheet{position:fixed;inset:0;z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.scrim{position:absolute;inset:0;background:rgba(6,14,20,.6)}
+.panel{position:relative;background:var(--bg);width:min(640px,100%);max-height:94%;overflow:auto;border-radius:22px 22px 0 0;padding:0 16px calc(24px + env(safe-area-inset-bottom,0px))}
+.panel-h{position:sticky;top:0;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:16px 12px;z-index:2}
+.panel-h h2{font-size:1.4rem}
+.panel-b{display:flex;flex-direction:column;gap:16px}
+@media (min-width:700px){.sheet{align-items:center}.panel{border-radius:22px;max-height:90%}}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:99px;font-weight:700;z-index:80;max-width:90vw;text-align:center}
+.pinbig{font-family:var(--display);font-weight:800;font-size:2.6rem;letter-spacing:.18em;font-variant-numeric:tabular-nums}
+.note{background:var(--accent-soft);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:4px}
+.done .btn.sent{background:var(--good-soft);border-color:var(--good);color:var(--good)}
+@media (prefers-reduced-motion:no-preference){.card,.btn{transition:border-color .15s,background .15s}}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div class="brand">Cuentas Claras</div>
+    <div class="top-r">
+      <span class="sync" id="sync" role="status">Cargando…</span>
+      <button class="icon-btn" data-act="settings" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    </div>
+  </header>
+  <div class="shell">
+    <nav class="nav" id="nav" aria-label="Secciones"></nav>
+    <main id="main"></main>
+  </div>
+</div>
+<div class="sheet" id="sheet" hidden>
+  <div class="scrim" data-act="closeSheet"></div>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <div class="panel-h"><h2 id="sheetTitle"></h2><button class="icon-btn" data-act="closeSheet" aria-label="Cerrar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div class="panel-b" id="sheetBody"></div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script>
+(function(){
+'use strict';
+var SK='cuentas_claras_v1';
+var COLORS=[['Rojo','#E5383B'],['Azul','#2F6FED'],['Verde','#2E9E5B'],['Amarillo','#F2B705'],['Naranja','#F27A1A'],['Morado','#8E4FD6'],['Rosado','#EC6FA8'],['Celeste','#3BB8E6'],['Marrón','#8A5A3C'],['Gris','#7B8794']];
+var ICONS={
+ hoy:'<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4"/>',
+ clientes:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17.5" cy="9" r="2.5"/><path d="M17 14.2c2.7.2 4.5 2 4.5 5"/>',
+ cuentas:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 21h8M12 18v3"/>',
+ mensajes:'<path d="M4 5h16a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H9l-5 4V6a1 1 0 0 1 1-1z"/>',
+ dinero:'<circle cx="12" cy="12" r="9"/><path d="M14.8 9.2c-.6-.8-1.6-1.2-2.8-1.2-1.7 0-2.8.9-2.8 2.1 0 3 5.8 1.3 5.8 4.3 0 1.2-1.2 2.1-3 2.1-1.2 0-2.3-.5-2.9-1.3M12 6v2M12 16v2"/>'
+};
+var TABS=[['hoy','Hoy'],['clientes','Clientes'],['cuentas','Cuentas'],['mensajes','Mensajes'],['dinero','Dinero']];
+var VARS=[['nombre','Nombre'],['apellido','Apellido'],['plataforma','Plataforma'],['correo','Correo'],['clave','Contraseña'],['perfil','Perfil'],['pin','PIN'],['fecha','Fecha de cobro'],['monto','Monto']];
+
+var S=null, db=null, docRef=null, saveTimer=null, saving=false, dirty=false;
+var tab='hoy', q='', msgSubId='', AF={}, lastSheet=null;
+
+/* ---------- utilidades ---------- */
+function $(s,r){return (r||document).querySelector(s)}
+function $$(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))}
+function uid(){return Math.random().toString(36).slice(2,8)+Date.now().toString(36).slice(-4)}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
+function num(v){var n=parseFloat(String(v).replace(',','.'));return isFinite(n)?n:0}
+function money(n){n=Math.round(n*100)/100;return 'S/ '+(Number.isInteger(n)?n:n.toFixed(2))}
+function pad(n){return String(n).padStart(2,'0')}
+function iso(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function parse(s){var p=s.split('-').map(Number);return new Date(p[0],p[1]-1,p[2])}
+function today(){return iso(new Date())}
+function daysBetween(a,b){return Math.round((parse(b)-parse(a))/864e5)}
+function addMonth(s,payDay){var d=parse(s),y=d.getFullYear(),m=d.getMonth()+1;if(m>11){m=0;y++}var last=new Date(y,m+1,0).getDate();return iso(new Date(y,m,Math.min(payDay,last)))}
+function addDays(s,n){var d=parse(s);d.setDate(d.getDate()+n);return iso(d)}
+function fmtDate(s){return parse(s).toLocaleDateString('es-PE',{day:'numeric',month:'long'})}
+function randPin(){return String(Math.floor(1000+Math.random()*9000))}
+function colorOf(name){var n=String(name||'').toLowerCase();for(var i=0;i<COLORS.length;i++)if(COLORS[i][0].toLowerCase()===n)return COLORS[i][1];return '#7B8794'}
+function fill(t,v){return t.replace(/\{(\w+)\}/g,function(m,k){return v[k]!=null?v[k]:m})}
+function toast(t){var e=$('#toast');e.textContent=t;e.hidden=false;clearTimeout(toast.t);toast.t=setTimeout(function(){e.hidden=true},1900)}
+
+/* ---------- plantillas ---------- */
+function defaultTemplates(){
+ var D=[
+ ['bienvenida','cobros','Entrega de datos (perfil nuevo)','¡Hola {nombre}! Muchas gracias por adquirir el servicio de {plataforma}.\n\nTus datos de acceso:\nCorreo: {correo}\nContraseña: {clave}\nPerfil: {perfil}\nPIN del perfil: {pin}\n\nTu próximo pago es el {fecha} ({monto}).\n\nPor favor no cambies la contraseña de la cuenta ni el PIN del perfil. Si tienes cualquier duda, escríbeme con confianza.'],
+ ['cobro','cobros','Recordatorio de cobro','Hola {nombre}, te recuerdo con cariño que tu servicio de {plataforma} vence el {fecha}. El monto es {monto}. Cuando hagas el pago, avísame y te lo confirmo. ¡Gracias!'],
+ ['cobro_vencido','cobros','Pago vencido','Hola {nombre}, tu servicio de {plataforma} venció el {fecha}. Si hoy no recibo tu pago, tendré que suspender tu perfil. Si tuviste algún inconveniente, cuéntame y lo vemos.'],
+ ['pago_ok','cobros','Confirmación de pago','Hola {nombre}, recibí tu pago de {monto}. ¡Gracias! Tu próximo cobro será el {fecha}.'],
+ ['corte','cobros','Servicio suspendido','Hola {nombre}, como no pude confirmar tu pago, tu perfil de {plataforma} fue suspendido. Cuando realices el pago de {monto} te envío de nuevo el acceso. Gracias por tu comprensión.'],
+ ['reactivar','cobros','Servicio reactivado','¡Hola {nombre}! Gracias por tu pago, ya reactivé tu servicio de {plataforma}.\n\nCorreo: {correo}\nContraseña: {clave}\nPerfil: {perfil}\nPIN del perfil: {pin}\n\nTu próximo pago es el {fecha}.'],
+ ['nuevo_pin','fallas','Cambio de PIN (perfil compartido)','Hola {nombre}, te aviso que se actualizó el PIN de tu perfil {perfil} en {plataforma}. Tu nuevo PIN es: {pin}. El correo y la contraseña de la cuenta siguen igual. Gracias por tu paciencia.'],
+ ['falla_ingreso','fallas','No puede ingresar','Hola {nombre}, vi que tuviste un inconveniente para ingresar a {plataforma}. Estoy revisando la cuenta ahora mismo y te aviso en unos minutos. Gracias por avisarme y por tu paciencia.'],
+ ['cuenta_caida','fallas','La plataforma tiene una falla','Hola {nombre}, la plataforma presentó una falla temporal que afectó la cuenta de {plataforma}. Ya estoy trabajando para solucionarlo. Si hace falta, te asigno otro perfil sin costo. Te escribo apenas esté listo.'],
+ ['cambio_cuenta','fallas','Cambio de cuenta','Hola {nombre}, para mejorar tu servicio de {plataforma} tuve que pasarte a otra cuenta. Tus nuevos datos:\n\nCorreo: {correo}\nContraseña: {clave}\nPerfil: {perfil}\nPIN del perfil: {pin}\n\nTu fecha de pago no cambia ({fecha}).'],
+ ['dispositivos','fallas','Demasiados dispositivos','Hola {nombre}, {plataforma} indica que hay demasiados dispositivos usando tu perfil {perfil}. Cierra sesión en los que no uses y vuelve a entrar con tus datos. Si sigue igual, avísame y lo reviso.'],
+ ['codigo','fallas','Código de verificación','Hola {nombre}, si {plataforma} te pide un código de verificación, avísame en ese momento y te lo envío enseguida. Solo escríbeme por aquí.'],
+ ['gracias','fallas','Agradecimiento','Hola {nombre}, gracias por confiar en mí con tu servicio de {plataforma}. Si necesitas algo, escríbeme.']
+ ];
+ return D.map(function(x){return {id:'t_'+x[0],key:x[0],cat:x[1],title:x[2],text:x[3]}});
+}
+function blank(){
+ return {v:1,
+  services:[{id:'hbo',name:'HBO Max',color:'#6A3DE8'},{id:'disney',name:'Disney+',color:'#1B49D6'},{id:'prime',name:'Amazon Prime',color:'#0EA5D9'},{id:'crunchy',name:'Crunchyroll',color:'#F47521'}],
+  accounts:[],customers:[],subs:[],templates:defaultTemplates(),
+  settings:{cc:'51',warn:3,demo:false}};
+}
+function normalize(s){
+ var b=blank();
+ ['services','accounts','customers','subs','templates'].forEach(function(k){if(!Array.isArray(s[k]))s[k]=b[k]});
+ s.settings=Object.assign({},b.settings,s.settings||{});
+ defaultTemplates().forEach(function(d){if(!s.templates.some(function(t){return t.key===d.key}))s.templates.push(d)});
+ s.subs=s.subs.filter(function(x){var a=s.accounts.find(function(a){return a.id===x.accountId});return a&&a.profiles.some(function(p){return p.id===x.profileId})&&s.customers.some(function(c){return c.id===x.customerId})});
+ return s;
+}
+function demo(){
+ var s=blank(),t=today();
+ s.settings.demo=true;
+ s.accounts=[
+  {id:'a1',serviceId:'hbo',email:'hbo.ejemplo@correo.com',password:'Clave-Ejemplo1',cost:18,price:8,perProfile:2,profiles:[{id:'p1',name:'Rojo',pin:'4821'},{id:'p2',name:'Azul',pin:'1357'},{id:'p3',name:'Verde',pin:'9024'},{id:'p4',name:'Amarillo',pin:'6610'},{id:'p5',name:'Naranja',pin:'3175'}]},
+  {id:'a2',serviceId:'disney',email:'disney.ejemplo@correo.com',password:'Clave-Ejemplo2',cost:22,price:9,perProfile:1,profiles:[{id:'p6',name:'Rojo',pin:'7743'},{id:'p7',name:'Azul',pin:'2208'},{id:'p8',name:'Verde',pin:'5581'},{id:'p9',name:'Morado',pin:'1996'}]}
+ ];
+ s.customers=[
+  {id:'c1',nombre:'Lucía',apellido:'Ramos Díaz',whatsapp:'900000001'},
+  {id:'c2',nombre:'Mateo',apellido:'Quispe Soto',whatsapp:'900000002'},
+  {id:'c3',nombre:'Carla',apellido:'Vega Núñez',whatsapp:'900000003'},
+  {id:'c4',nombre:'Diego',apellido:'Salas Paredes',whatsapp:'900000004'}
+ ];
+ function sub(id,c,a,p,due,price){var d=parse(due);return {id:id,customerId:c,accountId:a,profileId:p,price:price,nextDue:due,payDay:d.getDate(),cut:false,created:t}}
+ s.subs=[sub('s1','c1','a1','p1',addDays(t,-3),8),sub('s2','c2','a1','p1',addDays(t,6),8),sub('s3','c3','a2','p7',t,9),sub('s4','c4','a1','p2',addDays(t,2),8)];
+ return s;
+}
+
+/* ---------- datos ---------- */
+function svc(id){return S.services.find(function(x){return x.id===id})||{id:id,name:'(plataforma borrada)',color:'#7B8794'}}
+function acct(id){return S.accounts.find(function(x){return x.id===id})}
+function cust(id){return S.customers.find(function(x){return x.id===id})}
+function subById(id){return S.subs.find(function(x){return x.id===id})}
+function prof(a,id){return a&&a.profiles.find(function(p){return p.id===id})}
+function fullName(c){return (c.nombre+' '+(c.apellido||'')).trim()}
+function subsOfProfile(aid,pid){return S.subs.filter(function(s){return s.accountId===aid&&s.profileId===pid})}
+function used(a){return S.subs.filter(function(s){return s.accountId===a.id}).length}
+function cap(a){return a.profiles.length*a.perProfile}
+function free(a){return cap(a)-used(a)}
+function varsFor(s){
+ var c=cust(s.customerId),a=acct(s.accountId),p=prof(a,s.profileId);
+ return {nombre:c.nombre,apellido:c.apellido||'',plataforma:svc(a.serviceId).name,correo:a.email,clave:a.password,perfil:p.name,pin:p.pin,fecha:fmtDate(s.nextDue),monto:money(num(s.price))};
+}
+function tpl(key){var t=S.templates.find(function(x){return x.key===key});return (t||defaultTemplates().find(function(x){return x.key===key})).text}
+function msgFor(key,s,over){return fill(tpl(key),Object.assign(varsFor(s),over||{}))}
+function waUrl(phone,text){
+ var d=String(phone||'').replace(/\D/g,'');if(!d)return '';
+ if(d.indexOf('00')===0)d=d.slice(2);
+ else if(d.length<=9)d=String(S.settings.cc||'51')+d;
+ return 'https://wa.me/'+d+'?text='+encodeURIComponent(text);
+}
+function dueInfo(s){
+ var d=daysBetween(today(),s.nextDue),k,t;
+ if(s.cut){k='cut';t='Suspendido'}
+ else if(d<0){k='late';t=d===-1?'Venció ayer':'Venció hace '+(-d)+' días'}
+ else if(d===0){k='today';t='Vence hoy'}
+ else if(d===1){k='soon';t='Vence mañana'}
+ else if(d<=S.settings.warn){k='soon';t='Vence en '+d+' días'}
+ else{k='ok';t='Vence el '+fmtDate(s.nextDue)}
+ return {d:d,k:k,t:t};
+}
+function nextAfterPaid(s){
+ var t=today();
+ if(s.cut)return addMonth(t,parse(t).getDate());
+ var n=addMonth(s.nextDue,s.payDay);
+ while(daysBetween(t,n)<0)n=addMonth(n,s.payDay);
+ return n;
+}
+
+/* ---------- guardado ---------- */
+function cache(){try{localStorage.setItem(SK,JSON.stringify(S))}catch(e){}}
+function loadLocal(){try{var r=localStorage.getItem(SK);if(r)return JSON.parse(r)}catch(e){}return null}
+function setSync(k){
+ var e=$('#sync');e.className='sync'+(k==='err'?' err':'');
+ e.textContent={ok:'Guardado en tu cuenta',saving:'Guardando…',local:'Solo en este dispositivo',err:'No se pudo guardar'}[k]||'';
+}
+function save(){
+ cache();
+ if(!db||!docRef)return;
+ dirty=true;setSync('saving');clearTimeout(saveTimer);saveTimer=setTimeout(flush,500);
+}
+function flush(){
+ if(saving)return;
+ saving=true;dirty=false;
+ docRef.set({state:JSON.parse(JSON.stringify(S)),updatedAt:Date.now()}).then(function(){saving=false;setSync(dirty?'saving':'ok');if(dirty)flush()}).catch(function(){saving=false;setSync('err')});
+}
+function hasContent(s){return s.accounts.length||s.customers.length}
+function initDb(){
+ var p;try{p=window.claude&&window.claude.use?window.claude.use('db'):Promise.resolve(null)}catch(e){p=Promise.resolve(null)}
+ p.then(function(d){
+  db=d;
+  if(!db){setSync('local');return}
+  docRef=db.doc('app/state');
+  docRef.onSnapshot(function(snap){
+   if(snap.exists){
+    var remote=snap.data()&&snap.data().state;
+    if(remote&&!snap.metadata.hasPendingWrites&&!dirty&&!saving){
+     remote=normalize(JSON.parse(JSON.stringify(remote)));
+     if(JSON.stringify(remote)!==JSON.stringify(S)){S=remote;cache();renderAll()}
+    }
+    if(!dirty&&!saving)setSync('ok');
+   }else{
+    if(hasContent(S)){dirty=true;flush()}else setSync('ok');
+   }
+  },function(){db=null;setSync('local')});
+ }).catch(function(){db=null;setSync('local')});
+}
+
+/* ---------- hoja (ventana) ---------- */
+function openSheet(title,body){
+ $('#sheetTitle').textContent=title;$('#sheetBody').innerHTML=body;
+ $('#sheet').hidden=false;document.body.classList.add('lock');$('.panel').scrollTop=0;
+}
+function closeSheet(){$('#sheet').hidden=true;document.body.classList.remove('lock')}
+function F(id,label,val,o){
+ o=o||{};
+ return '<div class="field"><label for="'+id+'">'+label+'</label><input id="'+id+'" type="'+(o.type||'text')+'" value="'+esc(val)+'" '+(o.attr||'')+' autocomplete="off">'+(o.hint?'<small>'+o.hint+'</small>':'')+'</div>';
+}
+function v(id){var e=$('#'+id);return e?e.value.trim():''}
+function showErr(id,t){var e=$('#'+id);e.textContent=t;e.hidden=false}
+function confirmTap(btn){
+ if(btn.dataset.armed)return true;
+ btn.dataset.armed='1';btn.dataset.orig=btn.textContent;btn.textContent='Toca otra vez para confirmar';btn.classList.add('armed');
+ setTimeout(function(){if(btn.isConnected){delete btn.dataset.armed;btn.textContent=btn.dataset.orig;btn.classList.remove('armed')}},4000);
+ return false;
+}
+function copyText(text){
+ function fb(){var t=document.createElement('textarea');t.value=text;t.style.position='fixed';t.style.opacity='0';document.body.appendChild(t);t.select();var ok=false;try{ok=document.execCommand('copy')}catch(e){}t.remove();toast(ok?'Copiado':'Mantén presionado el texto para copiarlo')}
+ try{navigator.clipboard.writeText(text).then(function(){toast('Copiado')},fb)}catch(e){fb()}
+}
+function msgItem(label,phone,text){
+ var rows=Math.min(16,text.split('\n').length+Math.ceil(text.length/30)+1),url=waUrl(phone,text);
+ return '<div class="card msg"><div class="msg-h">'+esc(label)+'</div><textarea class="msg-text" rows="'+rows+'" aria-label="Mensaje para '+esc(label)+'">'+esc(text)+'</textarea><div class="row"><button class="btn" data-act="copy">Copiar</button>'+
+  (url?'<a class="btn primary" data-wa data-phone="'+esc(phone)+'" target="_blank" rel="noopener" href="'+esc(url)+'">Abrir WhatsApp</a>':'<span class="sub" style="align-self:center">Este cliente no tiene WhatsApp guardado</span>')+'</div></div>';
+}
+function msgSheet(title,intro,items){
+ openSheet(title,(intro?'<div class="note">'+intro+'</div>':'')+items.join('')+'<button class="btn big" data-act="closeSheet">Listo</button>');
+}
+
+/* ---------- vistas ---------- */
+function svcDot(sv){return '<i class="dot" style="--c:'+esc(sv.color)+'"></i>'}
+function dueCard(s){
+ var c=cust(s.customerId),a=acct(s.accountId),p=prof(a,s.profileId),sv=svc(a.serviceId),i=dueInfo(s);
+ var key=i.d<0?'cobro_vencido':'cobro',url=waUrl(c.whatsapp,msgFor(key,s));
+ var acts='';
+ if(s.cut){
+  acts='<button class="btn primary" data-act="paid" data-id="'+s.id+'">Ya pagó, reactivar</button>';
+ }else{
+  acts=(url?'<a class="btn primary" target="_blank" rel="noopener" href="'+esc(url)+'">Cobrar por WhatsApp</a>':'<button class="btn primary" data-act="payMsg" data-id="'+s.id+'">Ver mensaje de cobro</button>')+
+   '<button class="btn" data-act="paid" data-id="'+s.id+'">Ya pagó</button>'+
+   (i.d<0?'<button class="btn danger" data-act="cut" data-id="'+s.id+'">Cortar acceso</button>':'');
+ }
+ return '<article class="card"><div class="card-h"><b>'+esc(fullName(c))+'</b><span class="pill '+i.k+'">'+esc(i.t)+'</span></div>'+
+  '<div class="meta"><span>'+svcDot(sv)+esc(sv.name)+'</span><span><i class="dot" style="--c:'+colorOf(p.name)+'"></i>Perfil '+esc(p.name)+'</span><span>'+money(num(s.price))+'</span></div>'+
+  '<div class="row">'+acts+'</div></article>';
+}
+function vHoy(){
+ if(!S.accounts.length&&!S.customers.length){
+  return '<div class="head"><h1>Bienvenido</h1><p class="sub">Empieza en dos pasos y tendrás todo ordenado.</p></div>'+
+  '<div class="steps"><div class="step"><span class="n">1</span><div class="t"><b>Agrega una cuenta</b><span>El correo y la contraseña que compraste (HBO, Disney, Amazon, Crunchyroll).</span></div><button class="btn primary" data-act="newAccount">Agregar cuenta</button></div>'+
+  '<div class="step"><span class="n">2</span><div class="t"><b>Registra a tu primer cliente</b><span>La app elige el perfil y te escribe el mensaje con sus datos.</span></div><button class="btn" data-act="newClient">Nuevo cliente</button></div></div>'+
+  '<div class="empty"><b>¿Prefieres mirar primero?</b><span>Carga datos de ejemplo para ver cómo se ve la app. Los puedes borrar con un toque.</span><div class="row"><button class="btn" data-act="loadDemo">Ver con datos de ejemplo</button></div></div>';
+ }
+ var items=S.subs.map(function(s){return {s:s,i:dueInfo(s)}});
+ var cut=items.filter(function(x){return x.i.k==='cut'});
+ var due=items.filter(function(x){return x.i.k!=='ok'&&x.i.k!=='cut'}).sort(function(a,b){return a.i.d-b.i.d});
+ var later=items.filter(function(x){return x.i.k==='ok'}).sort(function(a,b){return a.i.d-b.i.d}).slice(0,6);
+ var late=due.filter(function(x){return x.i.d<0}).length,td=due.filter(function(x){return x.i.d===0}).length,soon=due.length-late-td;
+ var h='';
+ if(S.settings.demo)h+='<div class="banner"><span>Estás viendo datos de ejemplo.</span><button class="btn" data-act="clearDemo">Borrar ejemplos y empezar</button></div>';
+ h+='<div class="head"><h1>'+(due.length?(due.length===1?'1 cobro pendiente':due.length+' cobros pendientes'):'Todo al día')+'</h1><p class="sub">'+(due.length?late+' vencidos · '+td+' vencen hoy · '+soon+' próximos ('+S.settings.warn+' días)':'Nadie vence en los próximos '+S.settings.warn+' días.')+'</p></div>';
+ if(due.length)h+='<div class="stack">'+due.map(function(x){return dueCard(x.s)}).join('')+'</div>';
+ if(cut.length)h+='<h2 class="section-t">Suspendidos, esperando pago</h2><div class="stack">'+cut.map(function(x){return dueCard(x.s)}).join('')+'</div>';
+ if(later.length)h+='<h2 class="section-t">Próximos cobros</h2><div class="card" style="gap:0">'+later.map(function(x,n){var c=cust(x.s.customerId),sv=svc(acct(x.s.accountId).serviceId);return '<div class="card-h" style="padding-block:10px;'+(n?'border-top:1px solid var(--line)':'')+'"><span>'+esc(fullName(c))+' <span class="sub">· '+esc(sv.name)+'</span></span><span class="sub">'+esc(fmtDate(x.s.nextDue))+'</span></div>'}).join('')+'</div>';
+ h+='<button class="btn primary fab" data-act="newClient">+ Nuevo cliente</button>';
+ return h;
+}
+function custRow(c){
+ var subs=S.subs.filter(function(s){return s.customerId===c.id});
+ return '<button class="card" style="text-align:left;cursor:pointer;font:inherit;color:inherit" data-act="openCust" data-id="'+c.id+'"><div class="card-h"><b>'+esc(fullName(c))+'</b><span class="sub">'+esc(c.whatsapp||'Sin WhatsApp')+'</span></div>'+
+  '<div class="row">'+(subs.length?subs.map(function(s){var a=acct(s.accountId),p=prof(a,s.profileId),sv=svc(a.serviceId),i=dueInfo(s);return '<span class="pill '+i.k+'"><i class="dot" style="--c:'+esc(sv.color)+';margin-right:6px"></i>'+esc(sv.name)+' · '+esc(p.name)+' · '+esc(i.k==='ok'?fmtDate(s.nextDue):i.t)+'</span>'}).join(''):'<span class="pill neutral">Sin servicio asignado</span>')+'</div></button>';
+}
+function clientList(){
+ var t=q.toLowerCase();
+ var list=S.customers.filter(function(c){return !t||(fullName(c)+' '+(c.whatsapp||'')).toLowerCase().indexOf(t)>=0}).sort(function(a,b){return fullName(a).localeCompare(fullName(b),'es')});
+ if(!S.customers.length)return '<div class="empty"><b>Aún no tienes clientes</b><span>Toca “Nuevo cliente” para registrar el primero y asignarle un perfil.</span></div>';
+ if(!list.length)return '<div class="empty"><b>Nadie coincide con “'+esc(q)+'”</b><span>Prueba con otro nombre o con el número.</span></div>';
+ return list.map(custRow).join('');
+}
+function vClientes(){
+ return '<div class="head"><h1>Clientes</h1><p class="sub">'+S.customers.length+' en total. Toca uno para ver sus datos y mensajes.</p></div>'+
+  '<div class="field"><label for="q" class="lbl" style="position:absolute;left:-9999px">Buscar</label><input id="q" type="search" placeholder="Buscar por nombre o número" value="'+esc(q)+'"></div>'+
+  '<div class="stack" id="clist">'+clientList()+'</div><button class="btn primary fab" data-act="newClient">+ Nuevo cliente</button>';
+}
+function accCard(a){
+ var sv=svc(a.serviceId);
+ var profs=a.profiles.map(function(p){
+  var occ=subsOfProfile(a.id,p.id),full=occ.length>=a.perProfile;
+  return '<button class="prof'+(full?' full':'')+'" data-act="profSheet" data-id="'+a.id+'" data-id2="'+p.id+'"><span class="pn"><i class="dot" style="--c:'+colorOf(p.name)+'"></i>'+esc(p.name)+'</span><span class="pin">PIN '+esc(p.pin)+'</span><span class="who">'+(occ.length?occ.map(function(s){return esc(cust(s.customerId).nombre)}).join(', '):'Libre')+' · '+occ.length+'/'+a.perProfile+'</span></button>';
+ }).join('');
+ return '<article class="card"><div class="card-h"><b>'+esc(a.email)+'</b><span class="pill neutral">'+used(a)+' de '+cap(a)+' lugares</span></div>'+
+  '<dl class="kv"><dt>Contraseña</dt><dd><span class="secret" data-act="reveal" data-pw="'+esc(a.password)+'" role="button" tabindex="0">Toca para ver</span></dd><dt>Inversión</dt><dd>'+money(num(a.cost))+' al mes</dd><dt>Cobro</dt><dd>'+money(num(a.price))+' por cliente</dd></dl>'+
+  '<div class="profiles">'+profs+'</div><div class="row"><button class="btn small" data-act="editAccount" data-id="'+a.id+'">Editar cuenta</button><button class="btn small" data-act="addProfile" data-id="'+a.id+'">+ Perfil</button></div></article>';
+}
+function vCuentas(){
+ var h='<div class="head"><h1>Cuentas</h1><p class="sub">Toca un perfil para cambiar su PIN o ver quién lo usa.</p></div>';
+ if(!S.accounts.length)h+='<div class="empty"><b>Aún no hay cuentas</b><span>Agrega el correo y la contraseña de una cuenta de streaming.</span></div>';
+ S.services.forEach(function(sv){
+  var list=S.accounts.filter(function(a){return a.serviceId===sv.id});
+  if(list.length)h+='<h2 class="section-t" style="display:flex;align-items:center;gap:8px">'+svcDot(sv)+esc(sv.name)+'</h2><div class="stack">'+list.map(accCard).join('')+'</div>';
+ });
+ h+='<div class="row"><button class="btn" data-act="newService">+ Otra plataforma</button></div><button class="btn primary fab" data-act="newAccount">+ Nueva cuenta</button>';
+ return h;
+}
+function hl(t){return t.replace(/\{(\w+)\}/g,'<mark>{$1}</mark>')}
+function tplCard(t){
+ var s=msgSubId?subById(msgSubId):null,txt=s?fill(t.text,varsFor(s)):t.text;
+ var url=s?waUrl(cust(s.customerId).whatsapp,txt):'';
+ return '<article class="card"><div class="card-h"><b>'+esc(t.title)+'</b></div><div class="tplt">'+(s?esc(txt):hl(esc(t.text)))+'</div><div class="row"><button class="btn small" data-act="copyTpl" data-id="'+t.id+'">Copiar</button>'+
+  (url?'<a class="btn small primary" target="_blank" rel="noopener" href="'+esc(url)+'">WhatsApp</a>':'')+
+  '<button class="btn small" data-act="tplEdit" data-id="'+t.id+'">Editar</button></div></article>';
+}
+function vMensajes(){
+ var opts='<option value="">Sin cliente (ver el modelo)</option>'+S.subs.map(function(s){var c=cust(s.customerId),sv=svc(acct(s.accountId).serviceId);return '<option value="'+s.id+'"'+(s.id===msgSubId?' selected':'')+'>'+esc(fullName(c))+' · '+esc(sv.name)+'</option>'}).join('');
+ var groups=[['cobros','Cobros y accesos'],['fallas','Si algo falla'],['mios','Mis mensajes']];
+ var h='<div class="head"><h1>Mensajes</h1><p class="sub">Elige un cliente y los mensajes se llenan solos con sus datos.</p></div>'+
+ '<div class="field"><label for="msgSub">¿Para quién es?</label><select id="msgSub">'+opts+'</select></div>';
+ groups.forEach(function(g){
+  var l=S.templates.filter(function(t){return (t.cat||'mios')===g[0]});
+  if(l.length||g[0]==='mios')h+='<h2 class="section-t">'+g[1]+'</h2><div class="stack">'+(l.length?l.map(tplCard).join(''):'<div class="empty"><span>Aquí aparecerán los mensajes que crees tú.</span></div>')+'</div>';
+ });
+ return h+'<button class="btn primary fab" data-act="tplNew">+ Mensaje nuevo</button>';
+}
+function vDinero(){
+ var invest=0,income=0,maxInc=0;
+ S.accounts.forEach(function(a){invest+=num(a.cost);maxInc+=num(a.price)*cap(a)});
+ S.subs.forEach(function(s){if(!s.cut)income+=num(s.price)});
+ var profit=income-invest;
+ var rows=S.accounts.map(function(a){
+  var inc=S.subs.filter(function(s){return s.accountId===a.id&&!s.cut}).reduce(function(t,s){return t+num(s.price)},0),p=inc-num(a.cost),sv=svc(a.serviceId);
+  return '<tr><td>'+svcDot(sv)+' <b>'+esc(sv.name)+'</b><br><span class="sub">'+esc(a.email)+'</span><div class="bar" style="margin-top:6px"><i style="width:'+Math.round(100*used(a)/Math.max(1,cap(a)))+'%"></i></div></td><td>'+used(a)+'/'+cap(a)+'</td><td>'+money(num(a.cost))+'</td><td>'+money(inc)+'</td><td class="'+(p>=0?'pos':'neg-t')+'">'+money(p)+'</td></tr>';
+ }).join('');
+ return '<div class="head"><h1>Dinero</h1><p class="sub">Lo que ganas cada mes, contando solo clientes activos.</p></div>'+
+  '<div class="hero'+(profit<0?' neg':'')+'"><small>Ganancia mensual aproximada</small><span class="big-n">'+money(profit)+'</span><small>'+money(income)+' que cobras − '+money(invest)+' que inviertes</small></div>'+
+  '<div class="card"><div class="card-h"><span>Cobro mensual esperado</span><b>'+money(income)+'</b></div><div class="card-h"><span>Inversión en cuentas</span><b>'+money(invest)+'</b></div><div class="card-h"><span>Ganancia si llenas todos los lugares</span><b>'+money(maxInc-invest)+'</b></div></div>'+
+  (S.accounts.length?'<h2 class="section-t">Por cuenta</h2><div class="card"><div class="tscroll"><table class="table"><thead><tr><th>Cuenta</th><th>Lugares</th><th>Invierto</th><th>Cobro</th><th>Ganancia</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>':'<div class="empty"><b>Sin cuentas todavía</b><span>Agrega una cuenta con su inversión y cobro para ver tu ganancia.</span></div>')+
+  '<p class="sub">Los clientes suspendidos no se cuentan hasta que paguen.</p>';
+}
+function renderNav(){
+ var late=S.subs.filter(function(s){var k=dueInfo(s).k;return k==='late'||k==='today'}).length;
+ $('#nav').innerHTML=TABS.map(function(t){
+  return '<button data-act="tab" data-id="'+t[0]+'"'+(tab===t[0]?' aria-current="page"':'')+'><svg viewBox="0 0 24 24" aria-hidden="true">'+ICONS[t[0]]+'</svg><span>'+t[1]+'</span>'+(t[0]==='hoy'&&late?'<span class="badge" aria-label="'+late+' urgentes">'+late+'</span>':'')+'</button>';
+ }).join('');
+}
+function render(){
+ var f={hoy:vHoy,clientes:vClientes,cuentas:vCuentas,mensajes:vMensajes,dinero:vDinero}[tab];
+ $('#main').innerHTML=f();renderNav();
+}
+function renderAll(){render()}
+
+/* ---------- cliente + asignación ---------- */
+function openAssign(cid,preSvc){
+ var c=cid?cust(cid):null;
+ if(!S.accounts.length){
+  openSheet('Primero una cuenta','<p class="lead">Para asignar un perfil necesitas al menos una cuenta de streaming.</p><button class="btn primary big" data-act="newAccount">Agregar cuenta</button>');return;
+ }
+ var first=S.services.find(function(sv){return S.accounts.some(function(a){return a.serviceId===sv.id&&free(a)>0})})||S.services[0];
+ AF={cid:cid,svc:preSvc||first.id,acc:null,prof:null};
+ openSheet(c?'Agregar servicio':'Nuevo cliente','<div class="form">'+
+  (c?'<p class="lead">Cliente: <b>'+esc(fullName(c))+'</b></p>':'<div class="grid2">'+F('af-nombre','Nombre','',{attr:'required'})+F('af-apellido','Apellido','')+'</div>'+F('af-wsp','WhatsApp (solo números)','',{type:'tel',attr:'inputmode="tel"',hint:'Con este número se arma el enlace de WhatsApp.'}))+
+  '<div class="field"><span class="lbl">¿Qué servicio le darás?</span><div class="chips">'+S.services.map(function(sv){return '<label class="chip"><input type="radio" name="af-svc" value="'+sv.id+'"'+(sv.id===AF.svc?' checked':'')+'><span>'+svcDot(sv)+esc(sv.name)+'</span></label>'}).join('')+'</div></div>'+
+  '<div id="af-opts" class="form"></div>'+
+  '<div class="grid2">'+F('af-price','Cobro mensual (S/)','',{type:'number',attr:'inputmode="decimal" step="0.5" min="0"'})+F('af-date','Fecha del próximo cobro',addMonth(today(),parse(today()).getDate()),{type:'date',hint:'Se repite cada mes ese mismo día.'})+'</div>'+
+  '<p class="err" id="af-err" hidden></p><button class="btn primary big" data-act="saveAssign">Guardar y crear mensaje</button></div>');
+ afRefresh(true);
+}
+function afRefresh(setPrice){
+ var accs=S.accounts.filter(function(a){return a.serviceId===AF.svc&&free(a)>0});
+ if(!accs.some(function(a){return a.id===AF.acc}))AF.acc=accs.length?accs[0].id:null;
+ var a=AF.acc?acct(AF.acc):null,h='';
+ if(!accs.length){
+  h='<div class="empty"><b>No hay cuentas de '+esc(svc(AF.svc).name)+' con lugar libre</b><button class="btn" data-act="newAccount" data-svc="'+esc(AF.svc)+'">Agregar cuenta de '+esc(svc(AF.svc).name)+'</button></div>';
+  AF.prof=null;
+ }else{
+  h='<div class="field"><span class="lbl">¿En qué cuenta?</span><div class="opts">'+accs.map(function(x){return '<label class="opt"><input type="radio" name="af-acc" value="'+x.id+'"'+(x.id===AF.acc?' checked':'')+'><div><b>'+esc(x.email)+'</b><small>'+free(x)+' lugares libres</small></div></label>'}).join('')+'</div></div>';
+  var open=a.profiles.filter(function(p){return subsOfProfile(a.id,p.id).length<a.perProfile});
+  if(!open.some(function(p){return p.id===AF.prof}))AF.prof=open.length?open[0].id:null;
+  h+='<div class="field"><span class="lbl">¿Qué perfil?</span><div class="chips">'+a.profiles.map(function(p){var n=subsOfProfile(a.id,p.id).length,dis=n>=a.perProfile;return '<label class="chip"><input type="radio" name="af-prof" value="'+p.id+'"'+(p.id===AF.prof?' checked':'')+(dis?' disabled':'')+'><span><i class="dot" style="--c:'+colorOf(p.name)+'"></i>'+esc(p.name)+' <small>'+n+'/'+a.perProfile+'</small></span></label>'}).join('')+'</div></div>';
+ }
+ $('#af-opts').innerHTML=h;
+ if(setPrice&&a){var pr=$('#af-price');if(pr)pr.value=a.price}
+}
+function saveAssign(){
+ var c=AF.cid?cust(AF.cid):null;
+ var nombre=c?c.nombre:v('af-nombre');
+ if(!nombre)return showErr('af-err','Escribe el nombre del cliente.');
+ if(!AF.acc||!AF.prof)return showErr('af-err','Elige la cuenta y el perfil.');
+ var date=v('af-date'),price=v('af-price');
+ if(!date)return showErr('af-err','Elige la fecha del próximo cobro.');
+ if(price===''||num(price)<0)return showErr('af-err','Escribe cuánto va a pagar al mes.');
+ if(!c){c={id:uid(),nombre:nombre,apellido:v('af-apellido'),whatsapp:v('af-wsp')};S.customers.push(c)}
+ var s={id:uid(),customerId:c.id,accountId:AF.acc,profileId:AF.prof,price:num(price),nextDue:date,payDay:parse(date).getDate(),cut:false,created:today()};
+ S.subs.push(s);save();render();
+ msgSheet('Mensaje para '+c.nombre,'Listo, <b>'+esc(fullName(c))+'</b> quedó registrado. Revisa el mensaje y envíalo.',[msgItem(fullName(c),c.whatsapp,msgFor('bienvenida',s))]);
+}
+
+/* ---------- cliente: detalle ---------- */
+function custSheet(id){
+ var c=cust(id);if(!c)return;
+ var subs=S.subs.filter(function(s){return s.customerId===id});
+ var h='<p class="lead">'+(c.whatsapp?'WhatsApp: <b>'+esc(c.whatsapp)+'</b>':'Sin número de WhatsApp')+'</p>';
+ h+=subs.map(function(s){
+  var a=acct(s.accountId),p=prof(a,s.profileId),sv=svc(a.serviceId),i=dueInfo(s);
+  return '<article class="card"><div class="card-h"><b>'+svcDot(sv)+' '+esc(sv.name)+'</b><span class="pill '+i.k+'">'+esc(i.t)+'</span></div>'+
+  '<dl class="kv"><dt>Correo</dt><dd>'+esc(a.email)+'</dd><dt>Perfil</dt><dd><i class="dot" style="--c:'+colorOf(p.name)+'"></i> '+esc(p.name)+' · PIN '+esc(p.pin)+'</dd><dt>Cobro</dt><dd>'+money(num(s.price))+' · '+esc(fmtDate(s.nextDue))+'</dd></dl>'+
+  '<div class="row"><button class="btn small primary" data-act="subMsg" data-id="'+s.id+'">Mensaje con sus datos</button><button class="btn small" data-act="paid" data-id="'+s.id+'">Ya pagó</button><button class="btn small" data-act="payMsg" data-id="'+s.id+'">Cobrar</button></div>'+
+  '<div class="row"><button class="btn small" data-act="editSub" data-id="'+s.id+'">Editar cobro</button>'+(!s.cut&&i.d<0?'<button class="btn small danger" data-act="cut" data-id="'+s.id+'">Cortar acceso</button>':'')+'<button class="btn small danger" data-act="delSub" data-id="'+s.id+'">Quitar servicio</button></div></article>';
+ }).join('')||'<div class="empty"><span>Este cliente no tiene servicios.</span></div>';
+ h+='<button class="btn primary big" data-act="addService" data-id="'+id+'">+ Agregar otro servicio</button><div class="row"><button class="btn" data-act="editCust" data-id="'+id+'">Editar datos</button><button class="btn danger" data-act="delCust" data-id="'+id+'">Eliminar cliente</button></div>';
+ openSheet(fullName(c),h);
+}
+function editCust(id){
+ var c=cust(id);
+ openSheet('Editar cliente','<div class="form"><div class="grid2">'+F('ec-nombre','Nombre',c.nombre)+F('ec-apellido','Apellido',c.apellido||'')+'</div>'+F('ec-wsp','WhatsApp',c.whatsapp||'',{type:'tel',attr:'inputmode="tel"'})+'<p class="err" id="ec-err" hidden></p><button class="btn primary big" data-act="saveCust" data-id="'+id+'">Guardar</button></div>');
+}
+function editSub(id){
+ var s=subById(id),c=cust(s.customerId);
+ openSheet('Cobro de '+c.nombre,'<div class="form"><div class="grid2">'+F('es-price','Cobro mensual (S/)',s.price,{type:'number',attr:'inputmode="decimal" step="0.5" min="0"'})+F('es-date','Próximo cobro',s.nextDue,{type:'date'})+'</div><p class="err" id="es-err" hidden></p><button class="btn primary big" data-act="saveSub" data-id="'+id+'">Guardar</button></div>');
+}
+
+/* ---------- pagos y cortes ---------- */
+function paidSheet(id){
+ var s=subById(id),c=cust(s.customerId),a=acct(s.accountId),sv=svc(a.serviceId);
+ openSheet('Pago de '+c.nombre,'<div class="form"><p class="lead">'+esc(sv.name)+' · '+money(num(s.price))+(s.cut?'<br>Su perfil está suspendido; al confirmar se reactiva.':'')+'</p>'+
+  F('pd-date','Próximo cobro',nextAfterPaid(s),{type:'date',hint:'Ya viene calculado. Cámbialo solo si hace falta.'})+
+  '<button class="btn primary big" data-act="confirmPaid" data-id="'+id+'">Confirmar pago</button></div>');
+}
+function confirmPaid(id){
+ var s=subById(id),d=v('pd-date');if(!d)return;
+ var was=s.cut;s.nextDue=d;s.payDay=parse(d).getDate();s.cut=false;s.lastPaid=today();save();render();
+ var c=cust(s.customerId);
+ msgSheet('Pago registrado',was?'Se reactivó el servicio de <b>'+esc(fullName(c))+'</b>. Envíale sus datos de nuevo.':'Pago de <b>'+esc(fullName(c))+'</b> guardado. Puedes confirmárselo.',[msgItem(fullName(c),c.whatsapp,msgFor(was?'reactivar':'pago_ok',s))]);
+}
+function cutSheet(id){
+ var s=subById(id),c=cust(s.customerId),a=acct(s.accountId),p=prof(a,s.profileId),sv=svc(a.serviceId);
+ var others=subsOfProfile(a.id,p.id).filter(function(x){return x.id!==s.id&&!x.cut});
+ openSheet('Cortar acceso a '+c.nombre,'<div class="form"><p class="lead">Vas a cambiar el PIN del perfil <b>'+esc(p.name)+'</b> de '+esc(sv.name)+'.'+(others.length?' Comparte ese perfil con <b>'+others.map(function(x){return esc(fullName(cust(x.customerId)))}).join(', ')+'</b>: te dejaré un mensaje con el PIN nuevo para cada uno.':' Nadie más usa ese perfil.')+'</p>'+
+  F('ct-pin','PIN nuevo (4 números)',randPin(),{attr:'inputmode="numeric" maxlength="4" pattern="[0-9]{4}"',hint:'Ya viene uno al azar.'})+
+  '<p class="err" id="ct-err" hidden></p><button class="btn danger big" data-act="doCut" data-id="'+id+'">Cambiar PIN y suspender</button></div>');
+}
+function pinNotices(a,p,skipId,intro,extra){
+ var items=extra||[];
+ subsOfProfile(a.id,p.id).forEach(function(x){
+  if(x.id===skipId||x.cut)return;var c=cust(x.customerId);
+  items.push(msgItem(fullName(c)+' (comparte el perfil)',c.whatsapp,msgFor('nuevo_pin',x)));
+ });
+ return items;
+}
+function doCut(id){
+ var s=subById(id),a=acct(s.accountId),p=prof(a,s.profileId),pin=v('ct-pin');
+ if(!/^\d{4}$/.test(pin))return showErr('ct-err','El PIN debe tener 4 números.');
+ p.pin=pin;s.cut=true;save();render();
+ var c=cust(s.customerId),sv=svc(a.serviceId);
+ var items=[msgItem(fullName(c)+' (suspendido)',c.whatsapp,msgFor('corte',s))];
+ items=pinNotices(a,p,s.id,'',items);
+ msgSheet('Acceso cortado','<div style="display:flex;flex-direction:column;gap:6px"><b>Paso 1. Cambia el PIN en '+esc(sv.name)+'</b><span>Perfil '+esc(p.name)+' de '+esc(a.email)+'</span><span class="pinbig">'+esc(pin)+'</span><b>Paso 2. Envía los mensajes</b></div>',items);
+}
+function profSheet(aid,pid){
+ var a=acct(aid),p=prof(a,pid),occ=subsOfProfile(aid,pid);
+ openSheet('Perfil '+p.name,'<div class="form">'+
+  '<div class="card"><b>Quién lo usa</b>'+(occ.length?occ.map(function(s){var c=cust(s.customerId);return '<div class="card-h"><span>'+esc(fullName(c))+'</span><span class="pill '+dueInfo(s).k+'">'+esc(dueInfo(s).t)+'</span></div>'}).join(''):'<span class="sub">Nadie. Está libre.</span>')+'</div>'+
+  '<div class="grid2">'+F('pf-name','Nombre del perfil (color)',p.name)+F('pf-pin','PIN (4 números)',p.pin,{attr:'inputmode="numeric" maxlength="4" pattern="[0-9]{4}"'})+'</div>'+
+  '<p class="err" id="pf-err" hidden></p><button class="btn primary big" data-act="saveProf" data-id="'+aid+'" data-id2="'+pid+'">Guardar'+(occ.length?' y avisar si cambia el PIN':'')+'</button>'+
+  (occ.length?'':'<button class="btn danger" data-act="delProf" data-id="'+aid+'" data-id2="'+pid+'">Quitar perfil</button>')+'</div>');
+}
+function saveProf(aid,pid){
+ var a=acct(aid),p=prof(a,pid),name=v('pf-name'),pin=v('pf-pin');
+ if(!name)return showErr('pf-err','Escribe el nombre del perfil.');
+ if(!/^\d{4}$/.test(pin))return showErr('pf-err','El PIN debe tener 4 números.');
+ var changed=pin!==p.pin;p.name=name;p.pin=pin;save();render();
+ var items=changed?pinNotices(a,p,null,'',[]):[];
+ if(items.length)msgSheet('PIN actualizado','<div style="display:flex;flex-direction:column;gap:6px"><b>Cambia el PIN en '+esc(svc(a.serviceId).name)+'</b><span class="pinbig">'+esc(pin)+'</span><b>Avisa a quienes usan este perfil</b></div>',items);
+ else{closeSheet();toast('Guardado')}
+}
+
+/* ---------- cuentas ---------- */
+function accForm(aid,preSvc){
+ var a=aid?acct(aid):null;
+ openSheet(a?'Editar cuenta':'Nueva cuenta','<div class="form">'+
+  '<div class="field"><label for="ac-svc">Plataforma</label><select id="ac-svc">'+S.services.map(function(sv){return '<option value="'+sv.id+'"'+((a?a.serviceId:preSvc)===sv.id?' selected':'')+'>'+esc(sv.name)+'</option>'}).join('')+'</select></div>'+
+  F('ac-email','Correo de la cuenta',a?a.email:'',{type:'email',attr:'inputmode="email"'})+F('ac-pass','Contraseña de la cuenta',a?a.password:'')+
+  '<div class="grid2">'+F('ac-cost','Inversión al mes (S/)',a?a.cost:'',{type:'number',attr:'inputmode="decimal" step="0.5" min="0"',hint:'Lo que pagas tú por la cuenta.'})+F('ac-price','Cobro por cliente (S/)',a?a.price:'',{type:'number',attr:'inputmode="decimal" step="0.5" min="0"',hint:'Lo que paga cada cliente al mes.'})+'</div>'+
+  '<div class="grid2">'+(a?'':F('ac-n','Cantidad de perfiles',5,{type:'number',attr:'inputmode="numeric" min="1" max="12"'}))+F('ac-per','Usuarios por perfil',a?a.perProfile:1,{type:'number',attr:'inputmode="numeric" min="1" max="10"'})+'</div>'+
+  '<p class="err" id="ac-err" hidden></p><button class="btn primary big" data-act="saveAccount"'+(a?' data-id="'+aid+'"':'')+'>Guardar cuenta</button>'+
+  (a?'<button class="btn danger" data-act="delAccount" data-id="'+aid+'">Eliminar cuenta</button>':'')+'</div>');
+}
+function saveAccount(aid){
+ var a=aid?acct(aid):null,email=v('ac-email'),pass=v('ac-pass');
+ if(!email)return showErr('ac-err','Escribe el correo de la cuenta.');
+ if(!pass)return showErr('ac-err','Escribe la contraseña de la cuenta.');
+ var per=Math.max(1,Math.round(num(v('ac-per'))||1));
+ if(a){a.serviceId=v('ac-svc');a.email=email;a.password=pass;a.cost=num(v('ac-cost'));a.price=num(v('ac-price'));a.perProfile=per}
+ else{
+  var n=Math.min(12,Math.max(1,Math.round(num(v('ac-n'))||5)));
+  var profiles=[];for(var i=0;i<n;i++)profiles.push({id:uid(),name:COLORS[i]?COLORS[i][0]:'Perfil '+(i+1),pin:randPin()});
+  S.accounts.push({id:uid(),serviceId:v('ac-svc'),email:email,password:pass,cost:num(v('ac-cost')),price:num(v('ac-price')),perProfile:per,profiles:profiles});
+ }
+ save();closeSheet();render();toast('Cuenta guardada');
+}
+function svcForm(){
+ openSheet('Otra plataforma','<div class="form">'+F('sv-name','Nombre (por ejemplo Netflix)','')+'<div class="field"><label for="sv-color">Color</label><input id="sv-color" type="color" value="#E5383B" style="padding:4px"></div><p class="err" id="sv-err" hidden></p><button class="btn primary big" data-act="saveService">Agregar plataforma</button></div>');
+}
+
+/* ---------- mensajes ---------- */
+function tplForm(id){
+ var t=id?S.templates.find(function(x){return x.id===id}):null;
+ openSheet(t?'Editar mensaje':'Mensaje nuevo','<div class="form">'+F('tp-title','Nombre del mensaje',t?t.title:'')+
+  '<div class="field"><label for="tp-text">Texto</label><textarea id="tp-text" rows="9">'+esc(t?t.text:'')+'</textarea></div>'+
+  '<div class="field"><span class="lbl">Toca para insertar un dato del cliente</span><div class="vars">'+VARS.map(function(x){return '<button type="button" data-act="insVar" data-v="{'+x[0]+'}">'+x[1]+'</button>'}).join('')+'</div></div>'+
+  '<p class="err" id="tp-err" hidden></p><button class="btn primary big" data-act="saveTpl"'+(t?' data-id="'+t.id+'"':'')+'>Guardar mensaje</button>'+
+  (t&&t.key?'<button class="btn" data-act="resetTpl" data-id="'+t.id+'">Volver al texto original</button>':'')+
+  (t&&!t.key?'<button class="btn danger" data-act="delTpl" data-id="'+t.id+'">Borrar mensaje</button>':'')+'</div>');
+}
+function settingsSheet(){
+ openSheet('Ajustes','<div class="form"><div class="grid2">'+F('st-cc','Código de país para WhatsApp',S.settings.cc,{attr:'inputmode="numeric"',hint:'51 es Perú.'})+'<div class="field"><label for="st-warn">Avisar con anticipación</label><select id="st-warn">'+[1,2,3,5,7].map(function(n){return '<option value="'+n+'"'+(S.settings.warn===n?' selected':'')+'>'+n+(n===1?' día':' días')+'</option>'}).join('')+'</select></div></div>'+
+  '<button class="btn primary big" data-act="saveSettings">Guardar ajustes</button>'+
+  '<div class="note"><b>Sobre los avisos</b><span>La app te muestra qué cobros vencen y deja el mensaje listo en WhatsApp. El mensaje se envía cuando tú tocas el botón, no se manda solo.</span></div>'+
+  '<div class="row">'+(S.settings.demo?'<button class="btn danger" data-act="clearDemo">Borrar datos de ejemplo</button>':(S.accounts.length||S.customers.length?'':'<button class="btn" data-act="loadDemo">Cargar datos de ejemplo</button>'))+'</div></div>');
+}
+
+/* ---------- eventos ---------- */
+var A={
+ tab:function(d){tab=d.id;render();window.scrollTo(0,0)},
+ closeSheet:closeSheet,
+ noop:function(){},
+ newClient:function(){openAssign(null)},
+ addService:function(d){openAssign(d.id)},
+ openCust:function(d){custSheet(d.id)},
+ saveAssign:saveAssign,
+ editCust:function(d){editCust(d.id)},
+ saveCust:function(d){var c=cust(d.id),n=v('ec-nombre');if(!n)return showErr('ec-err','Escribe el nombre.');c.nombre=n;c.apellido=v('ec-apellido');c.whatsapp=v('ec-wsp');save();render();custSheet(d.id)},
+ delCust:function(d,b){if(!confirmTap(b))return;S.subs=S.subs.filter(function(s){return s.customerId!==d.id});S.customers=S.customers.filter(function(c){return c.id!==d.id});save();render();closeSheet();toast('Cliente eliminado')},
+ editSub:function(d){editSub(d.id)},
+ saveSub:function(d){var s=subById(d.id),p=v('es-price'),dt=v('es-date');if(p===''||!dt)return showErr('es-err','Completa el cobro y la fecha.');s.price=num(p);s.nextDue=dt;s.payDay=parse(dt).getDate();save();render();custSheet(s.customerId)},
+ delSub:function(d,b){if(!confirmTap(b))return;var s=subById(d.id),cid=s.customerId;S.subs=S.subs.filter(function(x){return x.id!==d.id});save();render();custSheet(cid);toast('Servicio quitado')},
+ subMsg:function(d){var s=subById(d.id),c=cust(s.customerId);msgSheet('Datos de '+c.nombre,'',[msgItem(fullName(c),c.whatsapp,msgFor('bienvenida',s))])},
+ payMsg:function(d){var s=subById(d.id),c=cust(s.customerId),k=dueInfo(s).d<0?'cobro_vencido':'cobro';msgSheet('Cobro a '+c.nombre,'',[msgItem(fullName(c),c.whatsapp,msgFor(k,s))])},
+ paid:function(d){paidSheet(d.id)},
+ confirmPaid:function(d){confirmPaid(d.id)},
+ cut:function(d){cutSheet(d.id)},
+ doCut:function(d){doCut(d.id)},
+ copy:function(d,b){var t=b.closest('.msg').querySelector('textarea');copyText(t.value)},
+ reveal:function(d,b){b.textContent=b.textContent==='Toca para ver'?b.dataset.pw:'Toca para ver'},
+ newAccount:function(d){accForm(null,d.svc)},
+ editAccount:function(d){accForm(d.id)},
+ saveAccount:function(d){saveAccount(d.id)},
+ delAccount:function(d,b){var a=acct(d.id);if(used(a)){toast('Primero quita a los clientes de esta cuenta');return}if(!confirmTap(b))return;S.accounts=S.accounts.filter(function(x){return x.id!==d.id});save();closeSheet();render()},
+ addProfile:function(d){var a=acct(d.id),n=a.profiles.length;a.profiles.push({id:uid(),name:COLORS[n]?COLORS[n][0]:'Perfil '+(n+1),pin:randPin()});save();render();toast('Perfil agregado')},
+ profSheet:function(d){profSheet(d.id,d.id2)},
+ saveProf:function(d){saveProf(d.id,d.id2)},
+ delProf:function(d,b){if(!confirmTap(b))return;var a=acct(d.id);a.profiles=a.profiles.filter(function(p){return p.id!==d.id2});save();closeSheet();render()},
+ newService:svcForm,
+ saveService:function(){var n=v('sv-name');if(!n)return showErr('sv-err','Escribe el nombre de la plataforma.');S.services.push({id:uid(),name:n,color:$('#sv-color').value});save();closeSheet();render();toast('Plataforma agregada')},
+ tplNew:function(){tplForm(null)},
+ tplEdit:function(d){tplForm(d.id)},
+ saveTpl:function(d){var ti=v('tp-title'),tx=$('#tp-text').value.trim();if(!ti||!tx)return showErr('tp-err','Escribe el nombre y el texto.');
+  if(d.id){var t=S.templates.find(function(x){return x.id===d.id});t.title=ti;t.text=tx}else S.templates.push({id:uid(),cat:'mios',title:ti,text:tx});
+  save();closeSheet();render();toast('Mensaje guardado')},
+ delTpl:function(d,b){if(!confirmTap(b))return;S.templates=S.templates.filter(function(x){return x.id!==d.id});save();closeSheet();render()},
+ resetTpl:function(d){var t=S.templates.find(function(x){return x.id===d.id}),o=defaultTemplates().find(function(x){return x.key===t.key});t.text=o.text;t.title=o.title;save();closeSheet();render();toast('Texto original')},
+ insVar:function(d){var t=$('#tp-text'),s=t.selectionStart==null?t.value.length:t.selectionStart,e=t.selectionEnd==null?s:t.selectionEnd;t.value=t.value.slice(0,s)+d.v+t.value.slice(e);t.focus();t.selectionStart=t.selectionEnd=s+d.v.length},
+ copyTpl:function(d){var t=S.templates.find(function(x){return x.id===d.id}),s=msgSubId?subById(msgSubId):null;copyText(s?fill(t.text,varsFor(s)):t.text)},
+ settings:settingsSheet,
+ saveSettings:function(){S.settings.cc=(v('st-cc').replace(/\D/g,''))||'51';S.settings.warn=parseInt($('#st-warn').value,10)||3;save();closeSheet();render();toast('Ajustes guardados')},
+ loadDemo:function(){var keep=S.settings;S=demo();S.settings.cc=keep.cc;S.settings.warn=keep.warn;save();closeSheet();tab='hoy';render()},
+ clearDemo:function(){var keep=S.settings;S=blank();S.settings.cc=keep.cc;S.settings.warn=keep.warn;save();closeSheet();tab='hoy';render();toast('Listo, empieza de cero')}
+};
+document.addEventListener('click',function(e){
+ var b=e.target.closest('[data-act]');if(!b)return;
+ var f=A[b.dataset.act];if(!f)return;
+ if(b.tagName==='A'&&b.getAttribute('href')==='#')e.preventDefault();
+ f(b.dataset,b,e);
+});
+document.addEventListener('keydown',function(e){
+ if(e.key==='Escape'&&!$('#sheet').hidden)closeSheet();
+ if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.act==='reveal'){e.preventDefault();A.reveal(e.target.dataset,e.target)}
+});
+document.addEventListener('input',function(e){
+ var t=e.target;
+ if(t.id==='q'){q=t.value;$('#clist').innerHTML=clientList()}
+ if(t.classList&&t.classList.contains('msg-text')){var a=t.closest('.msg').querySelector('a[data-wa]');if(a)a.href=waUrl(a.dataset.phone,t.value)}
+});
+document.addEventListener('change',function(e){
+ var t=e.target;
+ if(t.id==='msgSub'){msgSubId=t.value;render()}
+ if(t.name==='af-svc'){AF.svc=t.value;AF.acc=null;AF.prof=null;afRefresh(true)}
+ if(t.name==='af-acc'){AF.acc=t.value;AF.prof=null;afRefresh(true)}
+ if(t.name==='af-prof'){AF.prof=t.value}
+});
+
+/* ---------- inicio ---------- */
+S=loadLocal();
+S=normalize(S||blank());
+render();
+setSync('local');
+initDb();
+})();
+</script>
+
+</body></html>
